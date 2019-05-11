@@ -1,0 +1,19 @@
+{
+  "breadcrumbs.enabled": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": true
+  },
+  "editor.fontSize": 16,
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "all",
+  "editor.rulers": [80, 120],
+  "files.exclude": {
+    "node_modules/": true
+  },
+  "prettier.tslintIntegration": true,
+  "todo-tree.showCountsInTree": true,
+  "tslint.jsEnable": true,
+  "workbench.colorTheme": "Visual Studio Dark",
+  "workbench.iconTheme": "vscode-icons"
+}

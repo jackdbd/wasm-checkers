@@ -1,0 +1,12 @@
+{
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "rules": {
+    "indent": [true, "spaces", 2],
+    "no-console": {
+      "severity": "warning",
+      "options": ["debug", "info", "log", "time", "timeEnd", "trace"]
+    },
+    "quotemark": false,
+    "trailing-comma": false
+  }
+}

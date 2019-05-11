@@ -1,0 +1,44 @@
+{
+  "name": "wasm-checkers",
+  "description": "Checkers in WebAssembly",
+  "author": "jackdbd <jackdebidda@gmail.com> (http://www.giacomodebidda.com/)",
+  "repository": "git@github.com:jackdbd/wasm-checkers.git",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tslint --project . && tsc",
+    "build:wasm": "./wat2wasm src/checkers.wat -o public/checkers.wasm",
+    "ci": "yarn test && yarn coverage",
+    "clean": "rimraf build public/checkers.wasm",
+    "coverage": "codecov",
+    "format": "prettier --write '{,!(node_modules)/}**/*.{js,ts}'",
+    "lint": "tslint --config tslint.json",
+    "ncu": "ncu",
+    "ncuu": "ncu --upgrade",
+    "nuke": "rimraf node_modules && rm yarn.lock",
+    "test": "jest --verbose",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
+    "watch": "tsc --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "typescript": "3.4.5"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.12",
+    "@types/node": "^12.0.0",
+    "jest": "24.8.0",
+    "npm-check-updates": "3.1.9",
+    "prettier": "1.17.0",
+    "rimraf": "2.6.3",
+    "ts-jest": "^24.0.2",
+    "tslint": "5.16.0",
+    "tslint-config-prettier": "1.18.0"
+  },
+  "keywords": [
+    "typescript",
+    "wasm",
+    "WebAssembly"
+  ]
+}

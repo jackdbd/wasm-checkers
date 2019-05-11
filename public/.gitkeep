@@ -1,0 +1,4 @@
+This file is just a placeholder to keep the `public` directory under version
+control.
+
+The `public` directory will contain the compiled wasm module.
