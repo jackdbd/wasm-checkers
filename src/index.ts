@@ -28,6 +28,8 @@ export interface ICheckers {
     offsetForPosition: FromGameBoardToByteOffset,
     setCrown: FromBytesToBytes,
     setPiece: FromGameBoardToByteOffset,
+    setTurnOwner: (piece: number) => void;
+    toggleTurnOwner: (piece: number) => void;
     unsetCrown: FromBytesToBytes
 }
 

@@ -152,6 +152,27 @@
     (get_global $currentTurn)
   )
 
+  ;; Set the turn's owner
+  (func $setTurnOwner (param $piece i32)
+    (set_global $currentTurn (get_local $piece))
+  )
+
+  ;; At the end of a turn, switch turn's owner to the other player
+  (func $toggleTurnOwner
+    (if
+      (i32.eq
+        (call $getTurnOwner)
+        (i32.const 1)
+      )
+    (then
+      (call $setTurnOwner (i32.const 2))
+    )
+    (else
+      (call $setTurnOwner (i32.const 1))
+    )
+    )
+  )
+
   ;; CONSTANTS
   (export "BLACK" (global $BLACK))
   (export "BOARD_COLUMNS" (global $BOARD_COLUMNS))
@@ -173,5 +194,7 @@
   (export "offsetForPosition" (func $offsetForPosition))
   (export "setCrown" (func $setCrown))
   (export "setPiece" (func $setPiece))
+  (export "setTurnOwner" (func $setTurnOwner))
+  (export "toggleTurnOwner" (func $toggleTurnOwner))
   (export "unsetCrown" (func $unsetCrown))
 )

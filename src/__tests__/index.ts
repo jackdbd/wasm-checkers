@@ -175,8 +175,43 @@ describe("wasm-checkers", () => {
         });
 
         it("starts from turn 0", () => {
-            console.warn('EXPORTS of the WASM module instance', m);
+            // console.warn('EXPORTS of the WASM module instance', m);
             expect(m.getTurnOwner()).toBe(0);
+        });
+
+        it("keeps track of the current turn owner", () => {
+            m.setTurnOwner(1);
+            expect(m.getTurnOwner()).toBe(1);
+            m.setTurnOwner(2);
+            expect(m.getTurnOwner()).toBe(2);
+        });
+    });
+
+    describe("setTurnOwner", () => {
+        it("should be defined", () => {
+            expect(m.setTurnOwner).toBeDefined();
+        });
+
+        it("sets `piece` as the current turn owner", () => {
+            const piece = 1;
+            m.setTurnOwner(piece);
+            expect(m.getTurnOwner()).toBe(piece);
+        });
+    });
+
+    describe("toggleTurnOwner", () => {
+        it("should be defined", () => {
+            expect(m.toggleTurnOwner).toBeDefined();
+        });
+
+        it("toggles the turn owner", () => {
+            const piece = 1;
+            m.setTurnOwner(piece);
+            expect(m.getTurnOwner()).toBe(piece);
+            m.toggleTurnOwner(piece);
+            expect(m.getTurnOwner()).not.toBe(piece);
+            m.toggleTurnOwner(piece);
+            expect(m.getTurnOwner()).toBe(piece);
         });
     })
 
