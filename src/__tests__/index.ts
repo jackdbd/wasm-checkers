@@ -127,6 +127,40 @@ describe("wasm-checkers", () => {
         it("should be defined", () => {
             expect(m.getPiece).toBeDefined();
         });
+    });
+
+    describe("inRange", () => {
+        it("should be defined", () => {
+            expect(m.inRange).toBeDefined();
+        });
+
+        it("returns truthy for a value in range", () => {
+            const value = 5;
+            expect(m.inRange(0, 10, value)).toBeTruthy();
+        });
+
+        it("returns falsy for a value outside the range", () => {
+            const value = 11;
+            expect(m.inRange(0, 10, value)).toBeFalsy();
+        });
+
+        it("includes both the lower and the upper boundary in the range", () => {
+            expect(m.inRange(0, 10, 0)).toBeTruthy();
+            expect(m.inRange(0, 10, 10)).toBeTruthy();
+        });
+    });
+
+    describe("getPiece", () => {
+        it("should be defined", () => {
+            expect(m.getPiece).toBeDefined();
+        });
+
+        it("throws when we exceed the board boundaries", () => {
+            expect(() => {
+                const piece = 1;
+                m.getPiece(m.BOARD_COLUMNS + 1, m.BOARD_ROWS + 1, piece)
+            }).toThrow("unreachable");
+        });
     })
 
 });

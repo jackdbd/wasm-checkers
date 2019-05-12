@@ -4,8 +4,10 @@
   (memory $mem 1)
 
   ;; Constants that define the checkers board
-  (global $SQUARES_PER_ROW i32 (i32.const 8))
+  (global $BOARD_COLUMNS i32 (i32.const 7))
+  (global $BOARD_ROWS i32 (i32.const 7))
   (global $BYTES_PER_SQUARE i32 (i32.const 4))
+  (global $SQUARES_PER_ROW i32 (i32.const 8))
 
   ;; Bit flags used to compose the bit mask for each piece on the checkers board
   (global $EMPTY i32 (i32.const 0))      ;; [24 unused bits] 0000 0000
@@ -85,8 +87,49 @@
     )
   )
 
-  ;; TODO
-  (func $getPiece (param $x i32) (param $y i32) (param $piece i32)
+  ;; Detect if values are within range
+  (func $inRange (param $low i32) (param $high i32) (param $value i32) (result i32)
+    (i32.and
+      (i32.ge_s
+        (get_local $value)
+        (get_local $low)
+      )
+      (i32.le_s
+        (get_local $value)
+        (get_local $high)
+      )
+    )
+  )
+
+  ;; Get a piece from the board
+  (func $getPiece (param $x i32) (param $y i32) (result i32)
+    (if (result i32)
+      (block (result i32)
+        (i32.and
+          (call $inRange
+            (i32.const 0)
+            (get_global $BOARD_COLUMNS)
+            (get_local $x)
+          )
+          (call $inRange
+            (i32.const 0)
+            (get_global $BOARD_ROWS)
+            (get_local $y)
+          )
+        )
+      )
+      (then
+        (i32.load
+          (call $offsetForPosition
+            (get_local $x)
+            (get_local $y)
+          )
+        )
+      )
+      (else
+        (unreachable)
+      )
+    )
   )
 
   (func $setPiece (param $x i32) (param $y i32) (param $piece i32)
@@ -101,6 +144,8 @@
 
   ;; CONSTANTS
   (export "BLACK" (global $BLACK))
+  (export "BOARD_COLUMNS" (global $BOARD_COLUMNS))
+  (export "BOARD_ROWS" (global $BOARD_ROWS))
   (export "BYTES_PER_SQUARE" (global $BYTES_PER_SQUARE))
   (export "CROWN" (global $CROWN))
   (export "NOT_CROWN" (global $NOT_CROWN))
@@ -110,6 +155,7 @@
   ;; FUNCTIONS
   (export "getPiece" (func $getPiece))
   (export "indexForPosition" (func $indexForPosition))
+  (export "inRange" (func $inRange))
   (export "isBlack" (func $isBlack))
   (export "isCrowned" (func $isCrowned))
   (export "isWhite" (func $isWhite))

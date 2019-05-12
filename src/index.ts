@@ -6,14 +6,17 @@ type FromBytesToBytes = (piece: number) => number;
 export interface ICheckersModule {
     // constants
     BLACK: number,
+    BOARD_COLUMNS: number,
+    BOARD_ROWS: number,
     BYTES_PER_SQUARE: number,
     CROWN: number,
     NOT_CROWN: number,
     SQUARES_PER_ROW: number,
     WHITE: number,
     // functions
-    getPiece: FromGameBoardToByteOffset,
+    getPiece: (low: number, high: number, value: number) => number,
     indexForPosition: FromGameBoardToByteOffset,
+    inRange: (low: number, high: number, value: number) => number,
     isBlack: FromBytesToBytes,
     isCrowned: FromBytesToBytes,
     isWhite: FromBytesToBytes,
