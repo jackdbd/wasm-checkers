@@ -1,9 +1,12 @@
 import { instantiateModulePromise } from './loader';
 
-type AddToNumbers = (a: number, b: number) => number;
-
 export interface ICheckersModule {
-    addTwoNumbers: AddToNumbers
+    // constants
+    BYTES_PER_SQUARE: number,
+    SQUARES_PER_ROW: number,
+    // functions
+    indexForPosition: (x: number, y: number) => number,
+    offsetForPosition: (x: number, y: number) => number
 }
 
 export const initialize = async () => {

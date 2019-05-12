@@ -7,7 +7,30 @@ describe("wasm-checkers", () => {
         m = await initialize();
     });
 
-    it("adds two numbers and returns the expected result", () => {
-        expect(m.addTwoNumbers(1, 2)).toBe(3);
+    describe("indexForPosition", () => {
+        it("should be defined", () => {
+            expect(m.indexForPosition).toBeDefined();
+        });
+
+        it("returns the expected index", () => {
+            const iRow = 1;
+            const iColumn = 3;
+            const iExpected = (iRow + (iColumn * m.SQUARES_PER_ROW));
+            expect(m.indexForPosition(iRow, iColumn)).toBe(iExpected);
+        });
     });
+
+    describe("offsetForPosition", () => {
+        it("should be defined", () => {
+            expect(m.offsetForPosition).toBeDefined();
+        });
+
+        it("returns the expected index for the starting byte", () => {
+            const iRow = 1;
+            const iColumn = 3;
+            const iExpected = (iRow + (iColumn * m.SQUARES_PER_ROW)) * m.BYTES_PER_SQUARE;
+            expect(m.offsetForPosition(iRow, iColumn)).toBe(iExpected);
+        });
+    });
+
 });
