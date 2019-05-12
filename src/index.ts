@@ -13,8 +13,10 @@ export interface ICheckersModule {
     NOT_CROWN: number,
     SQUARES_PER_ROW: number,
     WHITE: number,
+
     // functions
     getPiece: (low: number, high: number, value: number) => number,
+    getTurnOwner: () => number,
     indexForPosition: FromGameBoardToByteOffset,
     inRange: (low: number, high: number, value: number) => number,
     isBlack: FromBytesToBytes,

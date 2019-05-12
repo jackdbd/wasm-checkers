@@ -16,6 +16,10 @@
   (global $CROWN i32 (i32.const 4))      ;; [24 unused bits] 0000 0100
   (global $NOT_CROWN i32 (i32.const 3))  ;; [24 unused bits] 0000 0011
 
+  ;; Global, mutable variable to keep track of the current game turn (the game
+  ;; starts from turn 0).
+  (global $currentTurn (mut i32) (i32.const 0))
+
   (func $isBlack (param $piece i32) (result i32)
     (i32.eq
       (i32.and
@@ -142,6 +146,11 @@
     )
   )
 
+  ;; Get the current turn owner (white or black).
+  (func $getTurnOwner (result i32)
+    (get_global $currentTurn)
+  )
+
   ;; CONSTANTS
   (export "BLACK" (global $BLACK))
   (export "BOARD_COLUMNS" (global $BOARD_COLUMNS))
@@ -154,6 +163,7 @@
 
   ;; FUNCTIONS
   (export "getPiece" (func $getPiece))
+  (export "getTurnOwner" (func $getTurnOwner))
   (export "indexForPosition" (func $indexForPosition))
   (export "inRange" (func $inRange))
   (export "isBlack" (func $isBlack))

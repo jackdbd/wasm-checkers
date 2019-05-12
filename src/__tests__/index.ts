@@ -161,6 +161,16 @@ describe("wasm-checkers", () => {
                 m.getPiece(m.BOARD_COLUMNS + 1, m.BOARD_ROWS + 1, piece)
             }).toThrow("unreachable");
         });
+    });
+
+    describe("getTurnOwner", () => {
+        it("should be defined", () => {
+            expect(m.getTurnOwner).toBeDefined();
+        });
+
+        it("starts from turn 0", () => {
+            expect(m.getTurnOwner()).toBe(0);
+        });
     })
 
 });
