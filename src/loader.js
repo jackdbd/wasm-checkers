@@ -28,8 +28,17 @@ const instantiateModulePromise = new Promise((resolve, reject) => {
     let instance;
     let error;
 
+    const importObject = {
+      imports: {
+        notifyPieceCrowned: (x, y) => {
+          // tslint:disable-next-line:no-console
+          console.log("A piece was crowned at (" + x + "," + y + ")");
+        },
+      },
+    };
+
     if (wasmModule) {
-      instance = new WebAssembly.Instance(module);
+      instance = new WebAssembly.Instance(module, importObject);
     } else {
       try {
         module = await compileModulePromise;
@@ -38,7 +47,7 @@ const instantiateModulePromise = new Promise((resolve, reject) => {
       }
 
       if (module) {
-        instance = new WebAssembly.Instance(module);
+        instance = new WebAssembly.Instance(module, importObject);
       }
     }
 

@@ -1,4 +1,8 @@
 (module $checkers
+
+  ;; Imports are functions defined on the Javascript side.
+  (import "imports" "notifyPieceCrowned" (func $notify_piececrowned (param $pieceX i32) (param $pieceY i32)))
+
   ;; Define a memory of at least 1 page (1 page is 64KB)
   ;; Memory can grow at the request of either the wasm module or the host.
   (memory $mem 1)
@@ -173,6 +177,43 @@
     )
   )
 
+  ;; TODO: add tests
+  ;; Crown black pieces in row 0, white pieces in row 7
+  (func $shouldCrown (param $pieceY i32) (param $piece i32) (result i32)
+    (i32.or
+      (i32.and
+        (i32.eq
+          (get_local $pieceY)
+          (i32.const 0)
+        )
+        (call $isBlack (get_local $piece))
+      )
+      (i32.and
+        (i32.eq
+          (get_local $pieceY)
+          (i32.const 7)
+        )
+        (call $isWhite (get_local $piece))
+      )
+    )
+  )
+
+  ;; Convert a piece into a crowned piece and invoke a host notifier.
+  (func $crownPiece (param $x i32) (param $y i32)
+    (local $piece i32)
+    (set_local $piece (call $getPiece (get_local $x) (get_local $y)))
+    (call $setPiece
+      (get_local $x)
+      (get_local $y)
+      (call $setCrown (get_local $piece))
+    )
+    (call $notify_piececrowned (get_local $x) (get_local $y))
+  )
+
+  (func $distance (param $x i32) (param $y i32) (result i32)
+    (i32.sub (get_local $x) (get_local $y))
+  )
+
   ;; CONSTANTS
   (export "BLACK" (global $BLACK))
   (export "BOARD_COLUMNS" (global $BOARD_COLUMNS))
@@ -184,6 +225,8 @@
   (export "WHITE" (global $WHITE))
 
   ;; FUNCTIONS
+  (export "crownPiece" (func $crownPiece))
+  (export "distance" (func $distance))
   (export "getPiece" (func $getPiece))
   (export "getTurnOwner" (func $getTurnOwner))
   (export "indexForPosition" (func $indexForPosition))
@@ -195,6 +238,7 @@
   (export "setCrown" (func $setCrown))
   (export "setPiece" (func $setPiece))
   (export "setTurnOwner" (func $setTurnOwner))
+  (export "shouldCrown" (func $shouldCrown))
   (export "toggleTurnOwner" (func $toggleTurnOwner))
   (export "unsetCrown" (func $unsetCrown))
 )

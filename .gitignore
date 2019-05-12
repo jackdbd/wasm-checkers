@@ -3,4 +3,5 @@
 /node_modules
 
 /public/checkers.wasm
+yarn-error.log
 wat2wasm

@@ -213,6 +213,25 @@ describe("wasm-checkers", () => {
             m.toggleTurnOwner(piece);
             expect(m.getTurnOwner()).toBe(piece);
         });
+    });
+
+    describe("crownPiece", () => {
+        it("should be defined", () => {
+            expect(m.crownPiece).toBeDefined();
+        });
+
+        it("notifies the host (Node.js) from the wasm module with console.log", () => {
+            const spy = jest.spyOn(console, "log");
+            m.crownPiece(1, 2);
+            expect(spy).toHaveBeenCalledTimes(1);
+            spy.mockRestore();
+        });
+    });
+
+    describe("distance", () => {
+        it("returns the expected distance", () => {
+            expect(m.distance(1, 6)).toBe(-5);
+        });
     })
 
 });

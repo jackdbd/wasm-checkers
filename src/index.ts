@@ -18,6 +18,8 @@ export interface ICheckers {
     WHITE: number,
 
     // functions
+    crownPiece: (iRow: number, iColumn: number) => void,
+    distance: (iRow: number, iColumn: number) => number,
     getPiece: (low: number, high: number, value: number) => number,
     getTurnOwner: () => number,
     indexForPosition: FromGameBoardToByteOffset,
