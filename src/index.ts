@@ -3,7 +3,10 @@ import { instantiateModulePromise } from './loader';
 type FromGameBoardToByteOffset = (iRow: number, iColumn: number) => number;
 type FromBytesToBytes = (piece: number) => number;
 
-export interface ICheckersModule {
+/**
+ * Exports from a checkers WASM module instance.
+ */
+export interface ICheckers {
     // constants
     BLACK: number,
     BOARD_COLUMNS: number,

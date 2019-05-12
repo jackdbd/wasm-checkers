@@ -1,4 +1,4 @@
-(module
+(module $checkers
   ;; Define a memory of at least 1 page (1 page is 64KB)
   ;; Memory can grow at the request of either the wasm module or the host.
   (memory $mem 1)
@@ -92,6 +92,7 @@
   )
 
   ;; Detect if values are within range
+  ;; See https://webassembly.org/docs/semantics/#32-bit-integer-operators
   (func $inRange (param $low i32) (param $high i32) (param $value i32) (result i32)
     (i32.and
       (i32.ge_s

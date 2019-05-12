@@ -1,7 +1,7 @@
-import { ICheckersModule, initialize } from "../index";
+import { ICheckers, initialize } from "../index";
 
 describe("wasm-checkers", () => {
-    let m: ICheckersModule;
+    let m: ICheckers;
 
     beforeAll(async () => {
         m = await initialize();
@@ -169,6 +169,7 @@ describe("wasm-checkers", () => {
         });
 
         it("starts from turn 0", () => {
+            console.warn('EXPORTS of the WASM module instance', m);
             expect(m.getTurnOwner()).toBe(0);
         });
     })

@@ -28,10 +28,8 @@ const instantiateModulePromise = new Promise((resolve, reject) => {
     let instance;
     let error;
 
-    const importObject = {};
-
     if (wasmModule) {
-      instance = new WebAssembly.Instance(module, importObject);
+      instance = new WebAssembly.Instance(module);
     } else {
       try {
         module = await compileModulePromise;
@@ -40,12 +38,12 @@ const instantiateModulePromise = new Promise((resolve, reject) => {
       }
 
       if (module) {
-        instance = new WebAssembly.Instance(module, importObject);
+        instance = new WebAssembly.Instance(module);
       }
     }
 
     if (instance) {
-      //   console.warn("WASM instance ready");
+      // console.warn("WASM instance ready");
       resolve(instance.exports);
     } else {
       reject(error);
