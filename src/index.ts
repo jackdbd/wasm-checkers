@@ -1,4 +1,4 @@
-import { instantiateModulePromise } from './loader';
+import { instantiateModulePromise, isValidModule } from './loader';
 
 type FromGameBoardToByteOffset = (iRow: number, iColumn: number) => number;
 type FromBytesToBytes = (piece: number) => number;
@@ -39,3 +39,5 @@ export const initialize = async () => {
         throw err;
     }
 }
+
+export const isValidWasmModule = isValidModule;

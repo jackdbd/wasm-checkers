@@ -53,6 +53,12 @@ const instantiateModulePromise = new Promise((resolve, reject) => {
   fn();
 });
 
+const isValidModule = () => {
+  const bufferSource = readFileSync(WASM_MODULE_PATH);
+  return WebAssembly.validate(bufferSource);
+};
+
 module.exports = {
   instantiateModulePromise,
+  isValidModule,
 };

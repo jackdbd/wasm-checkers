@@ -1,10 +1,16 @@
-import { ICheckers, initialize } from "../index";
+import { ICheckers, initialize, isValidWasmModule } from "../index";
 
 describe("wasm-checkers", () => {
     let m: ICheckers;
 
     beforeAll(async () => {
         m = await initialize();
+    });
+
+    describe("isValidWasmModule", () => {
+        it("is a valid .wasm module", () => {
+            expect(isValidWasmModule()).toBeTruthy();
+        });
     });
 
     describe("indexForPosition", () => {
