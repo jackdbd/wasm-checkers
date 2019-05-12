@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tslint --project . && tsc",
     "build:wasm": "./wat2wasm src/checkers.wat -o public/checkers.wasm",
-    "ci": "yarn test && yarn coverage",
+    "build:wasm-alternative": "node src/wat-to-wasm.js",
+    "ci": "yarn build:wasm-alternative && yarn test && yarn coverage",
     "clean": "rimraf build public/checkers.wasm",
     "coverage": "codecov",
     "format": "prettier --write '{,!(node_modules)/}**/*.{js,ts}'",
@@ -34,7 +35,8 @@
     "rimraf": "2.6.3",
     "ts-jest": "^24.0.2",
     "tslint": "5.16.0",
-    "tslint-config-prettier": "1.18.0"
+    "tslint-config-prettier": "1.18.0",
+    "wabt": "^1.0.10"
   },
   "keywords": [
     "typescript",
