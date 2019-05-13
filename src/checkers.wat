@@ -2,16 +2,21 @@
 
   ;; Imports are functions defined on the Javascript side.
   (import "imports" "notifyPieceCrowned" (func $notify_piececrowned (param $pieceX i32) (param $pieceY i32)))
+  (import "imports" "notifyPieceMoved" (func $notify_piecemoved (param $fromX i32) (param $fromY i32) (param $toX i32) (param $toY i32)))
 
   ;; Define a memory of at least 1 page (1 page is 64KB)
   ;; Memory can grow at the request of either the wasm module or the host.
   (memory $mem 1)
+
+  (global $TRUE i32 (i32.const 1))
+  (global $FALSE i32 (i32.const 0))
 
   ;; Constants that define the checkers board
   (global $BOARD_COLUMNS i32 (i32.const 7))
   (global $BOARD_ROWS i32 (i32.const 7))
   (global $BYTES_PER_SQUARE i32 (i32.const 4))
   (global $SQUARES_PER_ROW i32 (i32.const 8))
+  (global $MAX_JUMP_DISTANCE i32 (i32.const 2))
 
   ;; Bit flags used to compose the bit mask for each piece on the checkers board
   (global $EMPTY i32 (i32.const 0))      ;; [24 unused bits] 0000 0000
@@ -177,7 +182,14 @@
     )
   )
 
-  ;; TODO: add tests
+  ;; Determine if it's a player's turn
+  (func $isPlayersTurn (param $player i32) (result i32)
+    (i32.gt_s
+      (i32.and (get_local $player) (call $getTurnOwner))
+      (get_global $FALSE)
+    )
+  )
+
   ;; Crown black pieces in row 0, white pieces in row 7
   (func $shouldCrown (param $pieceY i32) (param $piece i32) (result i32)
     (i32.or
@@ -214,6 +226,129 @@
     (i32.sub (get_local $x) (get_local $y))
   )
 
+  ;; Determine if the move is valid
+  (func $isValidMove (param $fromX i32) (param $fromY i32)
+                     (param $toX i32) (param $toY i32) (result i32)
+    (local $player i32)
+    (local $target i32)
+
+    (set_local $player (call $getPiece (get_local $fromX) (get_local $fromY)))
+    (set_local $target (call $getPiece (get_local $toX) (get_local $toY)))
+
+    (if (result i32)
+      (block (result i32)
+        (i32.and
+          (call $validJumpDistance (get_local $fromY) (get_local $toY))
+          (i32.and
+            (call $isPlayersTurn (get_local $player))
+            ;; target must be unoccupied
+            (i32.eq (get_local $target) (i32.const 0))
+          )
+        )
+      )
+      (then
+        (get_global $TRUE)
+      )
+      (else
+        (get_global $FALSE)
+      )
+    )
+  )
+
+  ;; Ensures travel is 1 or 2 squares
+  (func $validJumpDistance (param $from i32) (param $to i32) (result i32)
+    (local $d i32)
+    (set_local $d
+    (if (result i32)
+      (i32.gt_s (get_local $to) (get_local $from))
+      (then
+        (call $distance (get_local $to) (get_local $from))
+      )
+      (else
+        (call $distance (get_local $from) (get_local $to))
+      ))
+    )
+    (i32.le_u
+      (get_local $d)
+      (get_global $MAX_JUMP_DISTANCE)
+    )
+  )
+
+  ;; Exported move function to be called by the game host
+  (func $move (param $fromX i32) (param $fromY i32)
+              (param $toX i32) (param $toY i32) (result i32)
+    (if (result i32)
+      (block (result i32)
+        (call $isValidMove (get_local $fromX) (get_local $fromY)
+                           (get_local $toX) (get_local $toY))
+      )
+      (then
+        (call $doMove (get_local $fromX) (get_local $fromY)
+                       (get_local $toX) (get_local $toY))
+      )
+      (else
+        (get_global $FALSE)
+      )
+    )
+  )
+
+  ;; Internal move function, performs actual move post-validation of target.
+  ;; Currently not handled:
+  ;;   - removing opponent piece during a jump
+  ;;   - detecting win condition
+  (func $doMove (param $fromX i32) (param $fromY i32)
+                 (param $toX i32) (param $toY i32) (result i32)
+    (local $curpiece i32)
+    (set_local $curpiece (call $getPiece (get_local $fromX)(get_local $fromY)))
+
+    (call $toggleTurnOwner)
+    (call $setPiece (get_local $toX) (get_local $toY) (get_local $curpiece))
+    (call $setPiece (get_local $fromX) (get_local $fromY) (i32.const 0))
+    (if (call $shouldCrown (get_local $toY) (get_local $curpiece))
+      (then (call $crownPiece (get_local $toX) (get_local $toY))))
+    (call $notify_piecemoved (get_local $fromX) (get_local $fromY)
+                             (get_local $toX) (get_local $toY))
+    (get_global $TRUE)
+  )
+
+  ;; Manually place each piece on the board to initialize the game
+  (func $initBoard
+    ;; Place the white pieces at the top of the board
+    (call $setPiece (i32.const 1) (i32.const 0) (get_global $WHITE))
+    (call $setPiece (i32.const 3) (i32.const 0) (get_global $WHITE))
+    (call $setPiece (i32.const 5) (i32.const 0) (get_global $WHITE))
+    (call $setPiece (i32.const 7) (i32.const 0) (get_global $WHITE))
+
+    (call $setPiece (i32.const 0) (i32.const 1) (get_global $WHITE))
+    (call $setPiece (i32.const 2) (i32.const 1) (get_global $WHITE))
+    (call $setPiece (i32.const 4) (i32.const 1) (get_global $WHITE))
+    (call $setPiece (i32.const 6) (i32.const 1) (get_global $WHITE))
+
+    (call $setPiece (i32.const 1) (i32.const 2) (get_global $WHITE))
+    (call $setPiece (i32.const 3) (i32.const 2) (get_global $WHITE))
+    (call $setPiece (i32.const 5) (i32.const 2) (get_global $WHITE))
+    (call $setPiece (i32.const 7) (i32.const 2) (get_global $WHITE))
+
+    ;; Place the black pieces at the bottom of the board
+    (call $setPiece (i32.const 0) (i32.const 5) (get_global $BLACK))
+    (call $setPiece (i32.const 2) (i32.const 5) (get_global $BLACK))
+    (call $setPiece (i32.const 4) (i32.const 5) (get_global $BLACK))
+    (call $setPiece (i32.const 6) (i32.const 5) (get_global $BLACK))
+
+    (call $setPiece (i32.const 1) (i32.const 6) (get_global $BLACK))
+    (call $setPiece (i32.const 3) (i32.const 6) (get_global $BLACK))
+    (call $setPiece (i32.const 5) (i32.const 6) (get_global $BLACK))
+    (call $setPiece (i32.const 7) (i32.const 6) (get_global $BLACK))
+
+    (call $setPiece (i32.const 0) (i32.const 7) (get_global $BLACK))
+    (call $setPiece (i32.const 2) (i32.const 7) (get_global $BLACK))
+    (call $setPiece (i32.const 4) (i32.const 7) (get_global $BLACK))
+    (call $setPiece (i32.const 6) (i32.const 7) (get_global $BLACK))
+
+    ;; Black goes first
+    (call $setTurnOwner (get_global $BLACK))
+  )
+
   ;; CONSTANTS
   (export "BLACK" (global $BLACK))
   (export "BOARD_COLUMNS" (global $BOARD_COLUMNS))
@@ -227,13 +362,18 @@
   ;; FUNCTIONS
   (export "crownPiece" (func $crownPiece))
   (export "distance" (func $distance))
+  (export "doMove" (func $doMove))
   (export "getPiece" (func $getPiece))
   (export "getTurnOwner" (func $getTurnOwner))
   (export "indexForPosition" (func $indexForPosition))
+  (export "initBoard" (func $initBoard))
   (export "inRange" (func $inRange))
   (export "isBlack" (func $isBlack))
   (export "isCrowned" (func $isCrowned))
+  (export "isPlayersTurn" (func $isPlayersTurn))
+  (export "isValidMove" (func $isValidMove))
   (export "isWhite" (func $isWhite))
+  (export "move" (func $move))
   (export "offsetForPosition" (func $offsetForPosition))
   (export "setCrown" (func $setCrown))
   (export "setPiece" (func $setPiece))
@@ -241,4 +381,5 @@
   (export "shouldCrown" (func $shouldCrown))
   (export "toggleTurnOwner" (func $toggleTurnOwner))
   (export "unsetCrown" (func $unsetCrown))
+  (export "validJumpDistance" (func $validJumpDistance))
 )

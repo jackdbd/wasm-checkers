@@ -130,8 +130,12 @@ describe("wasm-checkers", () => {
     });
 
     describe("getPiece", () => {
-        it("should be defined", () => {
-            expect(m.getPiece).toBeDefined();
+        it("returns the expected piece", () => {
+            const x = 0;
+            const y = 0;
+            const piece = m.WHITE | m.CROWN;
+            m.setPiece(x, y, piece);
+            expect(m.getPiece(x, y)).toBe(piece);
         });
     });
 
@@ -163,8 +167,7 @@ describe("wasm-checkers", () => {
 
         it("throws when we exceed the board boundaries", () => {
             expect(() => {
-                const piece = 1;
-                m.getPiece(m.BOARD_COLUMNS + 1, m.BOARD_ROWS + 1, piece)
+                m.getPiece(m.BOARD_COLUMNS + 1, m.BOARD_ROWS + 1)
             }).toThrow("unreachable");
         });
     });
@@ -175,7 +178,6 @@ describe("wasm-checkers", () => {
         });
 
         it("starts from turn 0", () => {
-            // console.warn('EXPORTS of the WASM module instance', m);
             expect(m.getTurnOwner()).toBe(0);
         });
 
@@ -232,6 +234,101 @@ describe("wasm-checkers", () => {
         it("returns the expected distance", () => {
             expect(m.distance(1, 6)).toBe(-5);
         });
+    });
+
+    describe("shouldCrown", () => {
+        it("should be defined", () => {
+            expect(m.shouldCrown).toBeDefined();
+        });
+    });
+
+    describe("isPlayersTurn", () => {
+        it("should be defined", () => {
+            expect(m.isPlayersTurn).toBeDefined();
+        });
+    });
+
+    describe("isValidMove", () => {
+        it("return a truthy value for a valid move", () => {
+            const fromX = 0;
+            const fromY = 0;
+            const toX = 1;
+            const toY = 1;
+            m.setPiece(fromX, fromY, m.BLACK);
+            expect(m.isValidMove(fromX, fromY, toX, toY)).toBeTruthy();
+        });
+    });
+
+    describe("doMove", () => {
+        it("notifies the host (Node.js) from the wasm module with console.log", () => {
+            const spy = jest.spyOn(console, "log");
+            m.doMove(0, 0, 1, 1);
+            expect(spy).toHaveBeenCalledTimes(1);
+            spy.mockRestore();
+        });
+    });
+
+    describe("validJumpDistance", () => {
+        it("allows jumps of 1 or 2 squares", () => {
+            expect(m.validJumpDistance(0, 1)).toBeTruthy();
+            expect(m.validJumpDistance(0, 2)).toBeTruthy();
+        });
+
+        it("does not allow jumps of 3 or more squares", () => {
+            expect(m.validJumpDistance(0, 3)).toBeFalsy();
+            expect(m.validJumpDistance(0, 4)).toBeFalsy();
+        });
+    });
+
+    // TODO: add more tests
+    describe("move", () => {
+        it("should be defined", () => {
+            expect(m.move).toBeDefined();
+        });
+    });
+
+    // TODO: fix these tests. Maybe make a resetBoard function to call beforeEach test.
+    describe.skip("initBoard", () => {
+        it.skip("sets white pieces at the top and black pieces at the bottom", () => {
+            m.initBoard();
+            expect(m.getPiece(0, 0)).toBe(0);
+            expect(m.getPiece(1, 0)).toBe(m.WHITE);
+            expect(m.getPiece(6, 7)).toBe(m.BLACK);
+            expect(m.getTurnOwner()).toBe(m.BLACK);
+        });
+
+        it.skip("sets the black as the first player", () => {
+            m.initBoard();
+            expect(m.getTurnOwner()).toBe(m.BLACK);
+        });
+
+        it("todo", () => {
+            const numPiecesBefore = countPiecesOnBoard(m);
+            expect(numPiecesBefore).toBe(0);
+
+            m.initBoard();
+
+            const numPiecesAfter = countPiecesOnBoard(m);
+            expect(numPiecesAfter).toBe(0);
+        });
     })
 
 });
+
+const countPiecesOnBoard = (m: ICheckers) => {
+    const iRows = Array(m.BOARD_ROWS).fill(0).map((_, i) => i);
+    const iColumns = Array(m.BOARD_COLUMNS).fill(0).map((_, i) => i);
+
+    let totPieces = 0;
+    for (const iColumn of iColumns) {
+        for (const iRow of iRows) {
+            const p = m.getPiece(iColumn, iRow);
+            console.warn(`[${iColumn},${iRow}]: ${p}`);
+            if (p === m.BLACK || p === m.WHITE) {
+                totPieces = totPieces + 1;
+            }
+        }
+    }
+
+    return totPieces;
+}

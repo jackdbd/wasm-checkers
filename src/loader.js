@@ -34,6 +34,12 @@ const instantiateModulePromise = new Promise((resolve, reject) => {
           // tslint:disable-next-line:no-console
           console.log("A piece was crowned at (" + x + "," + y + ")");
         },
+        notifyPieceMoved: (fromX, fromY, toX, toY) => {
+          // tslint:disable-next-line:no-console
+          console.log(
+            `A piece was moved from (${fromX},${fromY}) to (${toX}, ${toY})`
+          );
+        },
       },
     };
 

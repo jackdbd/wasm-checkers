@@ -20,19 +20,26 @@ export interface ICheckers {
     // functions
     crownPiece: (iRow: number, iColumn: number) => void,
     distance: (iRow: number, iColumn: number) => number,
-    getPiece: (low: number, high: number, value: number) => number,
+    doMove: (fromX: number, fromY: number, toX: number, toY: number) => number,
+    getPiece: (x: number, y: number) => number,
     getTurnOwner: () => number,
     indexForPosition: FromGameBoardToByteOffset,
     inRange: (low: number, high: number, value: number) => number,
     isBlack: FromBytesToBytes,
+    initBoard: () => void,
     isCrowned: FromBytesToBytes,
+    isPlayersTurn: (player: number) => number,
+    isValidMove: (fromX: number, fromY: number, toX: number, toY: number) => number,
     isWhite: FromBytesToBytes,
+    move: (fromX: number, fromY: number, toX: number, toY: number) => number,
     offsetForPosition: FromGameBoardToByteOffset,
     setCrown: FromBytesToBytes,
-    setPiece: FromGameBoardToByteOffset,
+    setPiece: (x: number, y: number, piece: number) => void,
     setTurnOwner: (piece: number) => void;
+    shouldCrown: (x: number, y: number) => number;
     toggleTurnOwner: (piece: number) => void;
-    unsetCrown: FromBytesToBytes
+    unsetCrown: FromBytesToBytes,
+    validJumpDistance: (from: number, to: number) => number
 }
 
 export const initialize = async () => {
